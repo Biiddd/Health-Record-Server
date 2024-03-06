@@ -18,6 +18,6 @@ const inputRouter = require('./router/api/input')
 app.use(inputRouter)
 
 
-app.listen(3000, () => {
+app.listen(33001, () => {
     console.log('Server is running at port 3000');
 })
