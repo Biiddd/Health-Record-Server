@@ -10,20 +10,18 @@ exports.writeData = (req, res) => {
 
     db.query(insert_date_hos, [date, checkHospital], (err, result) => {
         if (err) {
-            console.error('写入数据库时出错:', err);
+            //console.error('写入数据库时出错:', err);
             res.status(500).send('写入数据库时出错');
             return;
         }
-        //console.log('日期和检查医院成功写入数据库:', result);
 
         const this_check_id = result.insertId;
         //写入CA125
         if (ca125Value) {
             db.query(insert_data, [this_check_id, 1, ca125Value], (err, result) => {
                 if (err) {
-                    console.error('写入数据库时出错:', err);
+                    //console.error('写入数据库时出错:', err);
                     res.status(500).send('写入数据库时出错');
-                    return;
                 }
                 //console.log('CA125成功写入数据库:', result);
             });
@@ -35,7 +33,6 @@ exports.writeData = (req, res) => {
                 if (err) {
                     console.error('写入数据库时出错:', err);
                     res.status(500).send('写入数据库时出错');
-                    return;
                 }
                 //console.log('CA199成功写入数据库:', result);
             });
@@ -47,7 +44,6 @@ exports.writeData = (req, res) => {
                 if (err) {
                     console.error('写入数据库时出错:', err);
                     res.status(500).send('写入数据库时出错');
-                    return;
                 }
                 //console.log('CEA成功写入数据库:', result);
             });
@@ -59,7 +55,6 @@ exports.writeData = (req, res) => {
                 if (err) {
                     console.error('写入数据库时出错:', err);
                     res.status(500).send('写入数据库时出错');
-                    return;
                 }
                 //console.log('CA153成功写入数据库:', result);
             });
@@ -71,7 +66,6 @@ exports.writeData = (req, res) => {
                 if (err) {
                     console.error('写入数据库时出错:', err);
                     res.status(500).send('写入数据库时出错');
-                    return;
                 }
                 //console.log('CA724成功写入数据库:', result);
             });
@@ -83,7 +77,6 @@ exports.writeData = (req, res) => {
                 if (err) {
                     console.error('写入数据库时出错:', err);
                     res.status(500).send('写入数据库时出错');
-                    return;
                 }
                 //console.log('HE4成功写入数据库:', result);
             });

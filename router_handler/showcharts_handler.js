@@ -38,7 +38,7 @@ const getData = (req, res) => {
 
     db.query(query, [itemId], (err, rows) => {
         if (err) {
-            console.error('数据库查询失败：', err);
+            // console.error('数据库查询失败：', err);
             return res.status(500).json({ error: '数据库查询失败' });
         }
 

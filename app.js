@@ -8,6 +8,9 @@ const bodyParser = require('body-parser')
 app.use(bodyParser.json())
 app.use(express.urlencoded({ extended: false }))
 
+const loginRouter = require('./router/api/login')
+app.use(loginRouter)
+
 const inputRouter = require('./router/api/input')
 app.use(inputRouter)
 

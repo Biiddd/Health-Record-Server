@@ -7,7 +7,7 @@ const getLatestData = (req, res) => {
 
     db.query(latestDateQuery, [], (err, result) => {
         if (err) {
-            console.error('数据库查询失败：', err);
+            // console.error('数据库查询失败：', err);
             return res.status(500).json({ error: '数据库查询失败' });
         }
 
@@ -33,7 +33,7 @@ const getLatestData = (req, res) => {
 
         db.query(query, [latestDate], (err, rows) => {
             if (err) {
-                console.error('数据库查询失败：', err);
+                // console.error('数据库查询失败：', err);
                 return res.status(500).json({ error: '数据库查询失败' });
             }
         
