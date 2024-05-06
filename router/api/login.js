@@ -1,7 +1,7 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const loginHandle = require('../../router_handler/login_handler');
+const loginHandle = require("../../router_handler/login_handler");
 
-router.post('/api/login', loginHandle.isCorrect);
+router.post("/api/login", loginHandle.isCorrect);
 
 module.exports = router;
