@@ -1,6 +1,4 @@
 const db = require("../db/index");
-const { body } = require("express/lib/request");
-const req = require("express/lib/request");
 
 exports.writeData = (req, res) => {
   const insert_date_hos = `INSERT INTO checks (check_date, check_hospital, insert_time) VALUES (?, ?, NOW())`;
@@ -32,7 +30,7 @@ exports.writeData = (req, res) => {
           //console.error('写入数据库时出错:', err);
           res.status(500).send("写入数据库时出错");
         }
-        //console.log('CA125成功写入数据库:', result);
+        // console.log('CA125成功写入数据库:', result);
       });
     }
 
