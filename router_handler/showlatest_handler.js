@@ -1,4 +1,5 @@
 const db = require("../db/index");
+const dayjs = require("dayjs");
 const getLatestData = (req, res) => {
   const latestDateQuery = `
         SELECT MAX(check_date) AS latest_date
@@ -38,11 +39,7 @@ const getLatestData = (req, res) => {
       }
 
       rows.forEach((row) => {
-        const date = new Date(row.date);
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, "0");
-        const day = String(date.getDate()).padStart(2, "0");
-        row.date = `${year}-${month}-${day}`;
+        row.date = dayjs(row.date).format("YYYY-MM-DD");
       });
 
       res.json(rows);

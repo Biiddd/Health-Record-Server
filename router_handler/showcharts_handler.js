@@ -1,4 +1,5 @@
 const db = require("../db/index");
+const dayjs = require("dayjs");
 
 const getData = (req, res) => {
   // 验证 req.query 是否存在
@@ -45,7 +46,7 @@ const getData = (req, res) => {
                  JOIN checks c ON ci.check_id = c.check_id
         WHERE ci.item_id = ?
           AND c.check_date BETWEEN ? AND ?
-        ORDER BY c.check_date ASC ;
+        ORDER BY c.check_date ASC;
     `;
 
   // 执行数据库查询
@@ -57,11 +58,7 @@ const getData = (req, res) => {
 
     // 格式化日期
     rows.forEach((row) => {
-      const date = new Date(row.date);
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, "0");
-      const day = String(date.getDate()).padStart(2, "0");
-      row.date = `${year}-${month}-${day}`;
+      row.date = dayjs(row.date).format("YYYY-MM-DD");
     });
 
     res.json(rows);

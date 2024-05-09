@@ -1,4 +1,5 @@
 const db = require("../db/index");
+const dayjs = require("dayjs");
 
 exports.getAllData = (req, res) => {
     const query = `
@@ -29,18 +30,12 @@ exports.getAllData = (req, res) => {
 
         rows.forEach(row => {
             const { check_date, check_hospital, item_name, item_value } = row;
-
-            // 格式化日期为 yyyy-mm-dd 格式
-            const formattedDate = new Date(check_date);
-            const year = formattedDate.getFullYear();
-            const month = String(formattedDate.getMonth() + 1).padStart(2, "0");
-            const day = String(formattedDate.getDate()).padStart(2, "0");
-            const formattedDateString = `${year}-${month}-${day}`;
+            const formattedDate = dayjs(check_date).format('YYYY-MM-DD');
 
             // 如果该日期还没有对应的记录，则初始化一个对象
-            if (!groupedData[formattedDateString]) {
-                groupedData[formattedDateString] = {
-                    date: formattedDateString,
+            if (!groupedData[formattedDate]) {
+                groupedData[formattedDate] = {
+                    date: formattedDate,
                     hospital: check_hospital,
                     ca125: '',
                     ca199: '',
@@ -53,17 +48,17 @@ exports.getAllData = (req, res) => {
 
             // 根据项目名称设置对应的值
             if (item_name === 'CA125') {
-                groupedData[formattedDateString].ca125 = item_value;
+                groupedData[formattedDate].ca125 = item_value;
             } else if (item_name === 'CA199') {
-                groupedData[formattedDateString].ca199 = item_value;
+                groupedData[formattedDate].ca199 = item_value;
             } else if (item_name === 'CEA') {
-                groupedData[formattedDateString].cea = item_value;
+                groupedData[formattedDate].cea = item_value;
             } else if (item_name === 'CA153') {
-                groupedData[formattedDateString].ca153 = item_value;
+                groupedData[formattedDate].ca153 = item_value;
             } else if (item_name === 'CA724') {
-                groupedData[formattedDateString].ca724 = item_value;
+                groupedData[formattedDate].ca724 = item_value;
             } else if (item_name === 'HE4') {
-                groupedData[formattedDateString].he4 = item_value;
+                groupedData[formattedDate].he4 = item_value;
             }
         });
 
