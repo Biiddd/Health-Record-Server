@@ -12,7 +12,6 @@ const isCorrect = (req, res) => {
 
   db.query(query, [username], async (err, rows) => {
     if (err) {
-      // console.error('数据库查询失败：', err);
       return res.status(500).json({ error: "数据库查询失败" });
     }
 
@@ -30,15 +29,10 @@ const isCorrect = (req, res) => {
       return res.status(500).json({ error: "密码哈希为空" });
     }
 
-    // 打印调试信息
-    // console.log('输入的密码:', password);
-    // console.log('数据库中的密码哈希:', passwordHash);
-
     // 比较输入的密码和数据库中的密码哈希值
     const match = await bcrypt.compare(password, passwordHash);
     if (match) {
       // 密码匹配，返回成功
-      // onsole.log('密码匹配结果:', match);
       return res.json({ success: true });
     } else {
       // 密码不匹配

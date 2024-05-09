@@ -27,7 +27,7 @@ exports.getAllData = (req, res) => {
 
         // 使用对象存储数据，按日期分组
         const groupedData = {};
-
+        // 格式化日期
         rows.forEach(row => {
             const { check_date, check_hospital, item_name, item_value } = row;
             const formattedDate = dayjs(check_date).format('YYYY-MM-DD');

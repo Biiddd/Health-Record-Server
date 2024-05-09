@@ -1,8 +1,11 @@
 const db = require("../db/index");
 
 exports.writeData = (req, res) => {
-  const insert_date_hos = `INSERT INTO checks (check_date, check_hospital, insert_time) VALUES (?, ?, NOW())`;
-  const insert_data = `INSERT INTO check_items (check_id, item_id, item_value) VALUES (?, ?, ?)`;
+  const insertDateHosQuery = `INSERT INTO checks (check_date, check_hospital, insert_time)
+                              VALUES (?, ?, NOW())`;
+  const insertDataQuery = `INSERT INTO check_items (check_id, item_id, item_value)
+                           VALUES (?, ?, ?)`;
+
   let {
     date,
     checkHospital,
@@ -13,81 +16,66 @@ exports.writeData = (req, res) => {
     ca724Value,
     he4Value,
   } = req.body;
-  // console.log("body", req.body);
 
-  db.query(insert_date_hos, [date, checkHospital], (err, result) => {
-    if (err) {
-      //console.error('写入数据库时出错:', err);
-      res.status(500).send("写入数据库时出错");
+  // 检查是否已经存在相同日期的数据
+  const checkQuery = `SELECT * FROM checks WHERE check_date = ?`;
+
+  db.query(checkQuery, [date, checkHospital], (checkErr, checkResult) => {
+    if (checkErr) {
+      console.error("查询相同日期的数据时出错：", checkErr);
+      res.status(500).send("查询相同日期的数据时出错");
+      return;
+    }
+    // 如果存在相同日期的数据
+    if (checkResult.length > 0) {
+      res.status(400).send("相同日期的数据已经存在");
       return;
     }
 
-    const this_check_id = result.insertId;
-    //写入CA125
-    if (ca125Value) {
-      db.query(insert_data, [this_check_id, 1, ca125Value], (err, result) => {
-        if (err) {
-          //console.error('写入数据库时出错:', err);
-          res.status(500).send("写入数据库时出错");
-        }
-        // console.log('CA125成功写入数据库:', result);
-      });
-    }
+    // 如果没有相同日期的数据，继续执行插入操作
+    db.query(insertDateHosQuery, [date, checkHospital], (insertErr, insertResult) => {
+      if (insertErr) {
+        res.status(500).send("医院写入数据库时出错");
+        return;
+      }
 
-    //写入CA199
-    if (ca199Value) {
-      db.query(insert_data, [this_check_id, 2, ca199Value], (err, result) => {
-        if (err) {
-          console.error("写入数据库时出错:", err);
-          res.status(500).send("写入数据库时出错");
-        }
-        //console.log('CA199成功写入数据库:', result);
-      });
-    }
+      const thisCheckId = insertResult.insertId;
 
-    //写入CEA
-    if (ceaValue) {
-      db.query(insert_data, [this_check_id, 3, ceaValue], (err, result) => {
-        if (err) {
-          console.error("写入数据库时出错:", err);
-          res.status(500).send("写入数据库时出错");
-        }
-        //console.log('CEA成功写入数据库:', result);
-      });
-    }
+      // 将所有数据插入到 check_items
+      const items = [
+        { id: 1, value: ca125Value },
+        { id: 2, value: ca199Value },
+        { id: 3, value: ceaValue },
+        { id: 4, value: ca153Value },
+        { id: 5, value: ca724Value },
+        { id: 6, value: he4Value },
+      ];
 
-    //写入CA153
-    if (ca153Value) {
-      db.query(insert_data, [this_check_id, 4, ca153Value], (err, result) => {
-        if (err) {
-          console.error("写入数据库时出错:", err);
-          res.status(500).send("写入数据库时出错");
+      // 使用 Promise.all 执行所有插入操作
+      const insertPromises = items.map(item => {
+        if (item.value) {
+          return new Promise((resolve, reject) => {
+            db.query(insertDataQuery, [thisCheckId, item.id, item.value], (err, result) => {
+              if (err) {
+                reject(`写入 ${item.id} 数据时出错`);
+              } else {
+                resolve(result);
+              }
+            });
+          });
+        } else {
+          return Promise.resolve();
         }
-        //console.log('CA153成功写入数据库:', result);
       });
-    }
 
-    //写入CA724
-    if (ca724Value) {
-      db.query(insert_data, [this_check_id, 5, ca724Value], (err, result) => {
-        if (err) {
-          console.error("写入数据库时出错:", err);
-          res.status(500).send("写入数据库时出错");
-        }
-        //console.log('CA724成功写入数据库:', result);
-      });
-    }
-
-    //写入HE4
-    if (he4Value) {
-      db.query(insert_data, [this_check_id, 6, he4Value], (err, result) => {
-        if (err) {
-          console.error("写入数据库时出错:", err);
-          res.status(500).send("写入数据库时出错");
-        }
-        //console.log('HE4成功写入数据库:', result);
-      });
-    }
-    res.status(200).send("数据已成功写入数据库");
+      // 等待所有插入操作完成
+      Promise.all(insertPromises)
+          .then(() => {
+            res.status(200).send("数据已成功写入数据库");
+          })
+          .catch(error => {
+            res.status(500).send(error);
+          });
+    });
   });
 };
