@@ -20,6 +20,9 @@ app.use(showChartsRouter);
 const showLatestRouter = require("./router/api/showlatest");
 app.use(showLatestRouter);
 
+const allDataRouter = require("./router/api/alldata");
+app.use(allDataRouter);
+
 app.listen(33001, () => {
   console.log("Server is running at port 33001");
 });

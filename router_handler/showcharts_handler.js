@@ -13,9 +13,6 @@ const getData = (req, res) => {
   if (!startDate || !endDate || !chartType) {
     return res.status(400).json({ error: "请求参数不完整" });
   }
-  console.log("startDate:", startDate);
-  console.log("endDate:", endDate);
-  console.log("chartType:", chartType);
 
   let itemId;
   switch (chartType) {
@@ -48,6 +45,7 @@ const getData = (req, res) => {
                  JOIN checks c ON ci.check_id = c.check_id
         WHERE ci.item_id = ?
           AND c.check_date BETWEEN ? AND ?
+        ORDER BY c.check_date ASC ;
     `;
 
   // 执行数据库查询
