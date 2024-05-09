@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const showlatestHandle = require("../../router_handler/showlatest_handler");
+const showLatestHandle = require("../../router_handler/showlatest_handler");
 
-router.get("/api/latest", showlatestHandle.getLatestData);
+router.get("/api/latest", showLatestHandle.getLatestData);
 
 module.exports = router;

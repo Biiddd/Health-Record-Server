@@ -17,7 +17,7 @@ bcrypt.hash(password, saltRounds, (err, hash) => {
 
   // 使用 `hash` 值和其他数据将用户插入数据库
   const query =
-    "INSERT INTO `user` (`user_name`, `password`, `brth`, `height`) VALUES (?, ?, ?, ?)";
+    "INSERT INTO `user` (`user_name`, `password`, `birth`, `height`) VALUES (?, ?, ?, ?)";
   const values = [username, hash, birthday, height];
 
   // 使用 `db.query` 来执行 SQL 查询插入数据
