@@ -22,7 +22,6 @@ exports.writeData = (req, res) => {
 
   db.query(checkQuery, [date, checkHospital], (checkErr, checkResult) => {
     if (checkErr) {
-      console.error("查询相同日期的数据时出错：", checkErr);
       res.status(500).send("查询相同日期的数据时出错");
       return;
     }

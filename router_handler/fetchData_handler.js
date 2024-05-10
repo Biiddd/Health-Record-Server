@@ -4,6 +4,7 @@ const dayjs = require("dayjs");
 exports.getAllData = (req, res) => {
     const query = `
         SELECT
+            c.check_id,
             c.check_date,
             c.check_hospital,
             i.item_name,
@@ -29,12 +30,13 @@ exports.getAllData = (req, res) => {
         const groupedData = {};
         // 格式化日期
         rows.forEach(row => {
-            const { check_date, check_hospital, item_name, item_value } = row;
+            const { check_id, check_date, check_hospital, item_name, item_value } = row;
             const formattedDate = dayjs(check_date).format('YYYY-MM-DD');
 
             // 如果该日期还没有对应的记录，则初始化一个对象
             if (!groupedData[formattedDate]) {
                 groupedData[formattedDate] = {
+                    check_id: check_id,
                     date: formattedDate,
                     hospital: check_hospital,
                     ca125: '',
