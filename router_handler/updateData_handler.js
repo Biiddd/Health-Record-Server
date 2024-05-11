@@ -18,6 +18,10 @@ exports.updateData = (req, res) => {
                              SET update_time = NOW()
                              WHERE check_date = ?;`;
 
+  const deleteDataQuery = `DELETE
+                             FROM check_items
+                             WHERE (check_id = ? && item_id = ?);`;
+
   const {
     date,
     check_id,
@@ -45,10 +49,7 @@ exports.updateData = (req, res) => {
       return new Promise((resolve, reject) => {
         // 检查记录是否存在
         db.query(ifDataExistQuery, [check_id, item.id], (err, results) => {
-          if (err) {
-            return reject(`查询 ${item.id} 数据是否存在时出错: ${err.message}`);
-          }
-          if (results.length > 0) {
+          if (results.length > 0 && item.value !== "") {
             db.query(
               updateDataQuery,
               [item.value, check_id, item.id],
@@ -57,11 +58,24 @@ exports.updateData = (req, res) => {
                   console.error(
                     `更新 ${item.id} 数据时出错: ${updateErr.message}`,
                   );
-                  return reject(
-                    `更新 ${item.id} 数据时出错: ${updateErr.message}`,
-                  );
+                  return reject(updateErr);
                 }
                 resolve(updateResult);
+              },
+            );
+          } else if (results.length > 0 && item.value === "") {
+            db.query(
+              deleteDataQuery,
+              [check_id, item.id],
+              (deleteErr, deleteResult) => {
+                if (deleteErr) {
+                  console.error(
+                    `删除 ${item.id} 数据时出错: ${deleteErr.message}`,
+                  );
+                  return reject(deleteErr);
+                }
+                console.log(`删除 ${item.id} 数据成功`);
+                resolve(deleteResult);
               },
             );
           } else {
@@ -74,10 +88,9 @@ exports.updateData = (req, res) => {
                   console.error(
                     `插入 ${item.id} 数据时出错: ${insertErr.message}`,
                   );
-                  return reject(
-                    `插入 ${item.id} 数据时出错: ${insertErr.message}`,
-                  );
+                  return reject(insertErr);
                 }
+                console.log(`插入 ${item.id} 数据成功`);
                 resolve(insertResult);
               },
             );
@@ -93,13 +106,10 @@ exports.updateData = (req, res) => {
   Promise.all(updatePromises)
     .then(() => {
       db.query(updateTimeQuery, [date], (err, result) => {
-        if (err) {
-          return res.status(500).send(`更新时间时出错: ${err.message}`);
-        }
-        res.status(200).send("数据已成功更新并更新时间成功");
+        res.status(200).send("数据|时间更新成功");
       });
     })
     .catch((error) => {
-      res.status(500).send(`数据更新时出错: ${error.message}`);
+      res.status(500).send(`数据更新出错: ${error.message}`);
     });
 };
