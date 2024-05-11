@@ -1,4 +1,5 @@
 const db = require("../db/index");
+const logger = require("../modules/logger");
 const dayjs = require("dayjs");
 
 exports.getAllData = (req, res) => {
@@ -22,7 +23,7 @@ exports.getAllData = (req, res) => {
     // 执行查询
     db.query(query, [], (err, rows) => {
         if (err) {
-            console.error("查询数据库时出错:", err);
+            logger.error("查询数据库时出错:", err);
             return res.status(500).send("查询数据库时出错");
         }
 
@@ -65,6 +66,7 @@ exports.getAllData = (req, res) => {
         });
 
         // 将 groupedData 转换为数组
+        logger.info("获取全部数据成功");
         const formattedData = Object.values(groupedData);
 
         res.status(200).json(formattedData);

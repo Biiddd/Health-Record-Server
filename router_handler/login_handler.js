@@ -1,4 +1,5 @@
 const db = require("../db/index");
+const logger = require("../modules/logger");
 const bcrypt = require("bcrypt");
 
 const isCorrect = (req, res) => {
@@ -12,12 +13,14 @@ const isCorrect = (req, res) => {
 
   db.query(query, [username], async (err, rows) => {
     if (err) {
+      logger.error("数据库查询失败");
       return res.status(500).json({ error: "数据库查询失败" });
     }
 
     if (rows.length === 0) {
       // 用户名不存在
-      return res.status(401).json({ error: "用户名或密码错误" });
+        logger.warn("用户名不存在");
+      return res.status(401).json({ error: "用户名不存在" });
     }
 
     // 获取数据库中的密码哈希值
@@ -33,9 +36,11 @@ const isCorrect = (req, res) => {
     const match = await bcrypt.compare(password, passwordHash);
     if (match) {
       // 密码匹配，返回成功
+      logger.info("登录成功");
       return res.json({ success: true });
     } else {
       // 密码不匹配
+      logger.warn("密码不匹配");
       return res.status(401).json({ error: "用户名或密码错误" });
     }
   });

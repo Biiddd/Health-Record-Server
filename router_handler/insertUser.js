@@ -1,4 +1,5 @@
 const db = require("../db/index");
+const logger = require("../modules/logger");
 const bcrypt = require("bcrypt");
 const saltRounds = 10; // 可以根据需要调整盐的轮数
 
@@ -11,7 +12,7 @@ const height = 170.0;
 // 对密码进行加盐哈希处理
 bcrypt.hash(password, saltRounds, (err, hash) => {
   if (err) {
-    console.error("加盐哈希密码失败：", err);
+    logger.error("加盐哈希密码失败：", err);
     return;
   }
 
@@ -23,9 +24,9 @@ bcrypt.hash(password, saltRounds, (err, hash) => {
   // 使用 `db.query` 来执行 SQL 查询插入数据
   db.query(query, values, (err, results) => {
     if (err) {
-      console.error("插入用户失败：", err);
+      logger.error("插入用户失败：", err);
       return;
     }
-    console.log("用户成功插入，用户ID：", results.insertId);
+    logger.log("用户成功插入，用户ID：", results.insertId);
   });
 });

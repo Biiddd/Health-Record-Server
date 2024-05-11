@@ -1,4 +1,5 @@
 const express = require("express");
+const logger = require("./modules/logger");
 const app = express();
 
 const cors = require("cors");
@@ -27,5 +28,5 @@ const updateDataRouter = require("./router/api/updateData");
 app.use(updateDataRouter);
 
 app.listen(33001, () => {
-  console.log("Server is running at port 33001");
+  logger.info("服务启动成功, 监听端口 33001");
 });
