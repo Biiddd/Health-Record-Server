@@ -65,10 +65,10 @@ exports.writeData = (req, res) => {
                 [thisCheckId, item.id, item.value],
                 (err, result) => {
                   if (err) {
-                    logger.info(`插入 ${item.id} 时出错: ${err.message}`);
+                    logger.error(`插入 ${item.name} 时出错: ${err.message}`);
                     reject(err);
                   } else {
-                    logger.info(`插入 ${item.id} 成功`);
+                    logger.info(`插入 ${item.name} 成功`);
                     resolve(result);
                   }
                 },
