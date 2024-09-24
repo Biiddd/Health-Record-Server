@@ -1,19 +1,22 @@
 const db = require("../db/index");
 const dayjs = require("dayjs");
 const getLatestData = (req, res) => {
+
+  // 查询最近肿瘤指标化验日期
   const latestDateQuery = `
         SELECT MAX(check_date) AS latest_date
         FROM checks;
     `;
-
+  // 按最新日期查询
   db.query(latestDateQuery, [], (err, result) => {
     if (err) {
-      return res.status(500).json({ error: "数据库查询失败" });
+      return res.status(200).json({ code:200500, msg: "数据库查询失败" });
     }
 
-    const latestDate = result[0].latest_date;
+    const latestDate = result[0].latest_date; //赋值最近肿瘤指标化验日期
 
-    const query = `
+    // 按最新日期查询最肿瘤指标
+    const latest_tumor_value = `
             SELECT
                 i.item_id,
                 i.item_name,
@@ -31,16 +34,16 @@ const getLatestData = (req, res) => {
                 i.item_id, i.item_name, ci.item_value, c.check_date;
         `;
 
-    db.query(query, [latestDate], (err, rows) => {
+    db.query(latest_tumor_value, [latestDate], (err, rows) => {
       if (err) {
-        return res.status(500).json({ error: "数据库查询失败" });
+        return res.status(200).json({ code:200500, msg: "数据库查询失败" });
       }
 
       rows.forEach((row) => {
         row.date = dayjs(row.date).format("YYYY-MM-DD");
       });
 
-      res.json(rows);
+      res.status(200).json({code: 200, msg:rows});
     });
   });
 };

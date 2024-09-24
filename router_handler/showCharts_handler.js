@@ -4,7 +4,7 @@ const dayjs = require("dayjs");
 const getData = (req, res) => {
   // 验证 req.query 是否存在
   if (!req.query) {
-    return res.status(400).json({ error: "请求参数不完整" });
+    return res.status(200).json({ code: 200400, msg: "请求参数不完整" });
   }
 
   // 解构 req.query
@@ -12,9 +12,10 @@ const getData = (req, res) => {
 
   // 检查参数是否存在
   if (!startDate || !endDate || !chartType) {
-    return res.status(400).json({ error: "请求参数不完整" });
+    return res.status(200).json({ code: 200400, msg: "请求参数不完整" });
   }
 
+  let threshold;
   let itemId;
   switch (chartType) {
     case "CA125":
@@ -36,8 +37,14 @@ const getData = (req, res) => {
       itemId = 6;
       break;
     default:
-      return res.status(400).json({ error: "无效的图表类型" });
+      return res.status(200).json({ code: 200401, msg: "无效的图表类型" });
   }
+
+  const thresholdQuery = `
+        SELECT item_normal_max
+        FROM items
+        WHERE item_id = ?
+    `;
 
   // 基于传入的参数查询数据库
   const query = `
@@ -49,11 +56,20 @@ const getData = (req, res) => {
         ORDER BY c.check_date ASC;
     `;
 
+  // 查询阈值
+  db.query(thresholdQuery, itemId, (err, thresholdResult) => {
+    if (err) {
+      console.error("数据库查询失败：", err);
+      return res.status(200).json({ code: 200500, msg: "数据库查询失败" });
+    }
+    threshold = thresholdResult[0].item_normal_max;
+  });
+
   // 执行数据库查询
   db.query(query, [itemId, startDate, endDate], (err, rows) => {
     if (err) {
       console.error("数据库查询失败：", err);
-      return res.status(500).json({ error: "数据库查询失败" });
+      return res.status(200).json({ code: 200500, msg: "数据库查询失败" });
     }
 
     // 格式化日期
@@ -61,7 +77,13 @@ const getData = (req, res) => {
       row.date = dayjs(row.date).format("YYYY-MM-DD");
     });
 
-    res.json(rows);
+    res
+      .status(200)
+      .json({
+        code: 200,
+        msg: "请求成功",
+        data: { threshold: threshold, chartData: rows },
+      });
   });
 };
 

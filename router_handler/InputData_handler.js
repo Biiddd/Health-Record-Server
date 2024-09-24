@@ -16,6 +16,12 @@ exports.writeData = (req, res) => {
     ca153Value,
     ca724Value,
     he4Value,
+    rbcValue,
+    hbValue,
+    wbcValue,
+    pltValue,
+    neutValue,
+    weightValue,
   } = req.body;
 
   // 检查是否已经存在相同日期的数据
@@ -25,12 +31,14 @@ exports.writeData = (req, res) => {
 
   db.query(checkQuery, [date, checkHospital], (checkErr, checkResult) => {
     if (checkErr) {
-      res.status(500).send("查询相同日期的数据时出错");
+      logger.error("查询是否有相同日期的数据时出错");
+      res.status(200).json({ code: 200501, msg: "查询相同日期的数据时出错" });
       return;
     }
     // 如果存在相同日期的数据
     if (checkResult.length > 0) {
-      res.status(400).send("相同日期的数据已经存在");
+      logger.info("无法插入，存在相同日期的数据");
+      res.status(200).json({ code: 200502, msg: "相同日期的数据已经存在" });
       return;
     }
 
@@ -48,12 +56,18 @@ exports.writeData = (req, res) => {
 
         // 将所有数据插入到 check_items
         const items = [
-          { id: 1, value: ca125Value },
-          { id: 2, value: ca199Value },
-          { id: 3, value: ceaValue },
-          { id: 4, value: ca153Value },
-          { id: 5, value: ca724Value },
-          { id: 6, value: he4Value },
+          { id: 1, name: "CA125", value: ca125Value },
+          { id: 2, name: "CA199", value: ca199Value },
+          { id: 3, name: "CEA", value: ceaValue },
+          { id: 4, name: "CA153", value: ca153Value },
+          { id: 5, name: "CA724", value: ca724Value },
+          { id: 6, name: "HE4", value: he4Value },
+          { id: 7, name: "红细胞计数", value: rbcValue },
+          { id: 8, name: "血红蛋白", value: hbValue },
+          { id: 9, name: "白细胞计数", value: wbcValue },
+          { id: 10, name: "血小板计数", value: pltValue },
+          { id: 11, name: "中性粒细胞计数", value: neutValue },
+          { id: 12, name: "体重", value: weightValue },
         ];
 
         // 使用 Promise.all 执行所有插入操作
@@ -83,7 +97,7 @@ exports.writeData = (req, res) => {
         Promise.all(insertPromises)
           .then(() => {
             logger.info("全部数据已成功写入数据库");
-            res.status(200).send("数据已成功写入数据库");
+            res.status(200).json({ code: 200205, msg: "数据已成功写入数据库" });
           })
           .catch((error) => {
             res.status(500).send(error);

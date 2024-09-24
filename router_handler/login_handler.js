@@ -4,6 +4,7 @@ const bcrypt = require("bcrypt");
 
 const isCorrect = (req, res) => {
   const { username, password } = req.body;
+  console.log(username, password)
 
   const query = `
         SELECT password
@@ -14,13 +15,19 @@ const isCorrect = (req, res) => {
   db.query(query, [username], async (err, rows) => {
     if (err) {
       logger.error("数据库查询失败");
-      return res.status(500).json({ error: "数据库查询失败" });
+      return res.status(200).json({
+        code: 200501,
+        msg: "数据库查询失败",
+      });
     }
 
     if (rows.length === 0) {
       // 用户名不存在
-        logger.warn("用户名不存在");
-      return res.status(401).json({ error: "用户名不存在" });
+      logger.warn("用户名不存在");
+      return res.status(200).json({
+        code: 200401,
+        msg: "用户名不存在",
+      });
     }
 
     // 获取数据库中的密码哈希值
@@ -28,8 +35,11 @@ const isCorrect = (req, res) => {
 
     // 确保 passwordHash 不为空
     if (!passwordHash) {
-      // console.error('数据库中的密码哈希为空');
-      return res.status(500).json({ error: "密码哈希为空" });
+      // console.error(200).json({ error: "密码哈希为空" });
+      return res.json({
+        code: 200402,
+        msg: "密码哈希为空",
+      });
     }
 
     // 比较输入的密码和数据库中的密码哈希值
@@ -41,7 +51,10 @@ const isCorrect = (req, res) => {
     } else {
       // 密码不匹配
       logger.warn("密码不匹配");
-      return res.status(401).json({ error: "用户名或密码错误" });
+      return res.status(200).json({
+        code: 200401,
+        msg: "用户名或密码错误",
+      });
     }
   });
 };

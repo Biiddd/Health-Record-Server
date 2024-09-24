@@ -27,6 +27,9 @@ app.use(fetchDataRouter);
 const updateDataRouter = require("./router/api/updateData");
 app.use(updateDataRouter);
 
+const SMSRouter = require("./router/api/SMSLogin")
+app.use(SMSRouter)
+
 app.listen(33001, () => {
   logger.info("服务启动成功, 监听端口 33001");
 });
